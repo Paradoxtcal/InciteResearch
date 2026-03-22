@@ -194,7 +194,6 @@ Input:
 ...
 ```
 
-(Type anything to approve, or describe what to change.)
 
 ```
 ### PDF compression only (no API key needed)
