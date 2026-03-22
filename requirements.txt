@@ -1,0 +1,41 @@
+# ──────────────────────────────────────────────
+# InciteResearch dependencies
+# ──────────────────────────────────────────────
+
+# LangGraph & LangChain
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-openai>=0.2.0
+langchain-community>=0.3.0
+langchain-core>=0.3.0
+langchain-google-genai>=2.0.0
+
+# LLM clients (need at least one)
+openai>=1.40.0          # GPT-4o
+# anthropic>=0.34.0     # Claude (optional)
+google-genai>=0.1.0         # Gemini (optional)
+
+# Utilities
+requests>=2.31.0         # HTTP requests (literature search)
+httpx>=0.27.0
+
+# PDF processing (scripts/compress_pdfs.py)
+pikepdf>=9.0.0           # PDF compression
+Pillow>=10.0.0           # image processing
+tqdm>=4.66.0             # progress bar
+pypdf>=4.0.0             # PDF text extraction
+
+# Tooling
+python-dotenv>=1.0.0    # .env loading
+pydantic>=2.0.0
+
+# Optional: persistent checkpointing
+# langgraph-checkpoint-sqlite>=0.1.0
+# langgraph-checkpoint-postgres>=0.1.0
+
+# Optional: Streamlit Web UI
+# streamlit>=1.38.0
+# streamlit-chat>=0.1.0
+
+# Optional: Dify integration
+# dify-client>=0.1.0
