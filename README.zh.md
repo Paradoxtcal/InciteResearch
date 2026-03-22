@@ -183,7 +183,6 @@ Input:
 ...
 ```
 
-(Type anything to approve, or describe what to change.)
 ```
 
 ### 仅 PDF 压缩（无需 API key）
