@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <!-- background circle -->
+  <circle cx="200" cy="200" r="190" fill="#FFF0F3" stroke="#FFBDCB" stroke-width="4"/>
+
+  <!-- ears -->
+  <ellipse cx="112" cy="148" rx="46" ry="52" fill="#FFB3C6" transform="rotate(-18,112,148)"/>
+  <ellipse cx="288" cy="148" rx="46" ry="52" fill="#FFB3C6" transform="rotate(18,288,148)"/>
+  <ellipse cx="112" cy="152" rx="28" ry="32" fill="#FF8FAB" transform="rotate(-18,112,152)"/>
+  <ellipse cx="288" cy="152" rx="28" ry="32" fill="#FF8FAB" transform="rotate(18,288,152)"/>
+
+  <!-- head -->
+  <ellipse cx="200" cy="218" rx="138" ry="128" fill="#FFB3C6"/>
+
+  <!-- snout -->
+  <ellipse cx="200" cy="282" rx="62" ry="46" fill="#FF8FAB"/>
+  <!-- nostrils -->
+  <ellipse cx="180" cy="284" rx="13" ry="10" fill="#D63A6A"/>
+  <ellipse cx="220" cy="284" rx="13" ry="10" fill="#D63A6A"/>
+
+  <!-- eyes - whites -->
+  <ellipse cx="162" cy="200" rx="30" ry="32" fill="white"/>
+  <ellipse cx="238" cy="200" rx="30" ry="32" fill="white"/>
+  <!-- eyes - irises -->
+  <circle cx="165" cy="202" r="18" fill="#3D2B1F"/>
+  <circle cx="241" cy="202" r="18" fill="#3D2B1F"/>
+  <!-- eyes - pupils -->
+  <circle cx="169" cy="198" r="9" fill="#1A0F0A"/>
+  <circle cx="245" cy="198" r="9" fill="#1A0F0A"/>
+  <!-- eye shine -->
+  <circle cx="173" cy="193" r="4" fill="white"/>
+  <circle cx="249" cy="193" r="4" fill="white"/>
+
+  <!-- eyebrows -->
+  <path d="M138 172 Q162 158 186 168" stroke="#C1476A" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M214 168 Q238 158 262 172" stroke="#C1476A" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+  <!-- smile -->
+  <path d="M168 248 Q200 272 232 248" stroke="#C1476A" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+  <!-- blush -->
+  <ellipse cx="136" cy="238" rx="28" ry="18" fill="#FF6B8A" opacity="0.35"/>
+  <ellipse cx="264" cy="238" rx="28" ry="18" fill="#FF6B8A" opacity="0.35"/>
+</svg>
