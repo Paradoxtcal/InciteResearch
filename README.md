@@ -6,7 +6,7 @@
 
 Turn a researcher's vague frustration into a breakable assumption, a falsifiable story, and annotated core-algorithm code ready to hand off to Cursor or Claude Code.
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/) [![arXiv](https://img.shields.io/badge/arXiv-2605.06345-b31b1b.svg)](https://arxiv.org/abs/2605.06345) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 [Quick Start](#quick-start)
 
@@ -19,6 +19,8 @@ English | [简体中文](README_zh.md)
 Every existing AI research tool starts from a clear topic. [AutoResearchClaw](https://github.com/aiming-lab/AutoResearchClaw) turns a direction into a full paper pipeline. [karpathy/autoresearch](https://github.com/karpathy/autoresearch) runs overnight experiment loops given a training script. [DeepInnovator](https://github.com/HKUDS/DeepInnovator) generates hypotheses from literature distributions. They all assume you already know what you want to work on.
 
 Most real research starts somewhere messier: a method that feels wrong, a paper whose assumption seems shaky, an evaluation metric you've never trusted. InciteResearch works at that moment — before the topic is clear — and produces something concrete enough for the downstream tools to take over.
+
+> 📄 **Paper:** [More Than Can Be Said: A Benchmark and Framework for Pre-Question Scientific Ideation](https://arxiv.org/abs/2605.06345) — Jie Yu, Song Qiu (arXiv:2605.06345 [cs.AI])
 
 ## Key Features
 

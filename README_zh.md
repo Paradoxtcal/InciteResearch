@@ -6,7 +6,7 @@
 
 将研究者模糊的不满转化为可打破的假设、可证伪的故事主线，以及带注释的核心算法代码——随时可交付给 Cursor 或 Claude Code。
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/) [![arXiv](https://img.shields.io/badge/arXiv-2605.06345-b31b1b.svg)](https://arxiv.org/abs/2605.06345) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 [快速上手](#%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B)
 
@@ -19,6 +19,8 @@
 现有的 AI 科研工具都从一个清晰的课题出发：[AutoResearchClaw](https://github.com/aiming-lab/AutoResearchClaw) 将研究方向转化为完整的论文流水线；[karpathy/autoresearch](https://github.com/karpathy/autoresearch) 给定训练脚本后可以跑通夜间实验循环；[DeepInnovator](https://github.com/HKUDS/DeepInnovator) 从文献分布中生成假设。它们都预设你已经知道自己要研究什么。
 
 但真实的研究往往从更混乱的地方开始：一个感觉有问题的方法、一篇假设存疑的论文、一个你从未信任过的评估指标。InciteResearch 就工作在这个时刻——在课题还不清晰之前——并产出足够具体的内容，让下游工具得以接手。
+
+> 📄 **论文:** [More Than Can Be Said: A Benchmark and Framework for Pre-Question Scientific Ideation](https://arxiv.org/abs/2605.06345) — Jie Yu, Song Qiu (arXiv:2605.06345 [cs.AI])
 
 ## 核心特性
 
