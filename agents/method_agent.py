@@ -1,6 +1,6 @@
 """
 Method Agent
-Generates core algorithm code meant to be handed to an AI coding assistant.
+Produces a compact implementation sketch from the locked method spec.
 """
 
 from __future__ import annotations
@@ -16,8 +16,7 @@ def _llm(temperature=0.3):
 
 CORE_CODE_SYSTEM = """You translate research ideas into implementable code notes.
 
-Your output will be handed to an AI coding assistant (e.g., Cursor / Claude Code).
-The goal is to make intent unambiguous, not to produce a runnable project.
+The goal is to make intent unambiguous for a downstream implementation pass, not to ship a runnable project.
 
 Output rules:
 1) Use Python + PyTorch style; pseudocode is allowed when clearly marked
@@ -85,7 +84,7 @@ def generate_core_code_node(state: ResearchState) -> ResearchState:
             f"Implement exactly the components in the locked method spec.\n"
             f"For everything else, state “reuse baseline’s XXX”.\n"
             f"Only add # WHY for key design decisions and # DIFF for key differences vs baseline.\n"
-            f"End with a # AI CODING PROMPT telling Cursor/Claude Code how to integrate this into the baseline."
+            f"End with a short # INTEGRATION NOTE describing how this would slot into the chosen baseline."
         )),
     ])
 
@@ -93,7 +92,7 @@ def generate_core_code_node(state: ResearchState) -> ResearchState:
 
     integration_resp = llm.invoke([
         SystemMessage(content=(
-            "Generate an integration instruction for Cursor / Claude Code (English, directly copy-pastable).\n"
+            "Generate a brief English integration note another engineer could follow.\n"
             "Format:\n"
             "```\n"
             "I have a baseline implementation of [X] from [repo].\n"

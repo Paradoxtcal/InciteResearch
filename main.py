@@ -14,11 +14,11 @@ UI = {
     "direction_pick": "Which direction do you pick? (1/2/3, or describe your own idea)",
     "papers_header": "Candidate papers (title/abstract). Full text is skipped by default; pick only if needed:",
     "pick_fulltext": "Which papers should we read full text for (PDF only)? e.g., 1,3 / all / auto / Enter to skip",
-    "pick_fulltext_before_code": "Before generating core code, which papers should we read full text for? e.g., 2,5 / all / auto / Enter to skip",
+    "pick_fulltext_before_code": "Before the implementation sketch, which papers should we read full text for? e.g., 2,5 / all / auto / Enter to skip",
     "proposal_ready": "A research proposal draft is ready.",
     "proposal_hint": "(Type anything to approve, or describe what to change.)",
     "building_story": "Building the story arc...",
-    "generating_code": "Generating core algorithm code...",
+    "generating_code": "Drafting implementation notes...",
     "done_files": "✅  Done! Files saved:",
     "direction_selected": "✓ Selected direction: {name}",
     "need_llm_config": "❌ Configure at least one LLM provider: GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY",
@@ -28,9 +28,9 @@ UI = {
     "directions_found": "Found 3 candidate directions (each breaks a different assumption):",
     "broken_assumption": "Broken assumption: {v}",
     "one_line": "One-liner: {v}",
-    "file_core": "  · core_algorithm.py    ← hand to Cursor / Claude Code",
-    "file_proposal": "  · research_proposal.md ← story + checks + proposal",
-    "file_cursor": "  · cursor_prompt.txt    ← paste into Cursor",
+    "file_core": "  · core_algorithm.py",
+    "file_proposal": "  · research_proposal.md",
+    "file_cursor": "  · cursor_prompt.txt",
     "file_state": "  · research_state.json  ← resume state",
 }
 
@@ -256,6 +256,11 @@ def _handle_llm_config_error(err: Exception, config: dict | None = None) -> bool
         if sid:
             print(UI["resume_hint"].format(sid=sid))
         return True
+    if "configured base url (401)" in low:
+        print("\n❌ " + msg.strip())
+        if sid:
+            print(UI["resume_hint"].format(sid=sid))
+        return True
     if "invalid anthropic_api_key" in low:
         print("\n❌ Invalid ANTHROPIC_API_KEY. Update ANTHROPIC_API_KEY in your environment (or .env) and retry.")
         if sid:
@@ -273,6 +278,11 @@ def _handle_llm_config_error(err: Exception, config: dict | None = None) -> bool
         return True
     if "anthropic_api_key is required" in low:
         print("\n❌ ANTHROPIC_API_KEY is required when provider=anthropic. Set it and retry, or switch provider.")
+        if sid:
+            print(UI["resume_hint"].format(sid=sid))
+        return True
+    if "deepseek_api_key (or openai_api_key) is required when provider=deepseek" in low:
+        print("\n❌ DEEPSEEK_API_KEY (or OPENAI_API_KEY) is required when provider=deepseek. Set it in .env and retry.")
         if sid:
             print(UI["resume_hint"].format(sid=sid))
         return True
@@ -338,13 +348,17 @@ def check_env():
     if provider in ("anthropic", "claude") and not (_has_real_key(anthropic_key) or _has_real_key(ofox_key)):
         print("❌ ANTHROPIC_API_KEY (or OFOX_API_KEY) is required when provider=anthropic. Set a valid key in .env or your shell.")
         sys.exit(1)
+    if provider in ("deepseek", "deep-seek"):
+        if not (_has_real_key(os.environ.get("DEEPSEEK_API_KEY")) or _has_real_key(os.environ.get("OPENAI_API_KEY"))):
+            print("❌ DEEPSEEK_API_KEY (or OPENAI_API_KEY for the same gateway) is required when provider=deepseek. Set a valid key in .env or your shell.")
+            sys.exit(1)
 
     has_any_key = any(
         _has_real_key(os.environ.get(k))
-        for k in ("GEMINI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "OFOX_API_KEY")
+        for k in ("GEMINI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "OFOX_API_KEY", "DEEPSEEK_API_KEY")
     )
     if not has_any_key and not provider:
-        print("❌ Configure at least one LLM provider: GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY / OFOX_API_KEY")
+        print("❌ Configure at least one LLM provider: GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY / OFOX_API_KEY / DEEPSEEK_API_KEY")
         sys.exit(1)
 
 
@@ -782,6 +796,11 @@ if __name__ == "__main__":
     parser.add_argument("--compress-pdfs", action="store_true")
     parser.add_argument("--pdf-dir", default=".")
     parser.add_argument("--resume", help="Resume session ID")
+    parser.add_argument(
+        "--refine-method",
+        action="store_true",
+        help="Run the in-tree research lab (literature + plan) using research_lab/configs defaults and merged InciteResearch artifacts.",
+    )
     args = parser.parse_args()
 
     try:
@@ -800,6 +819,35 @@ if __name__ == "__main__":
         from scripts.compress_pdfs import compress_and_zip
         compress_and_zip(input_dir=args.pdf_dir)
         sys.exit(0)
+
+    if args.refine_method:
+        import sys
+        from pathlib import Path
+        _root = Path(__file__).resolve().parent
+        _argv = [sys.argv[0]]
+        i = 1
+        while i < len(sys.argv):
+            if sys.argv[i] == "--refine-method":
+                i += 1
+                continue
+            _argv.append(sys.argv[i])
+            i += 1
+        if "--yaml-location" not in _argv:
+            _argv.extend(
+                [
+                    "--yaml-location",
+                    str(_root / "research_lab" / "configs" / "MATH_agentlab.yaml"),
+                ]
+            )
+        st = _root / "research_state.json"
+        if "--incite-state" not in _argv and st.is_file():
+            _argv.extend(["--incite-state", str(st)])
+        prop = _root / "research_proposal.md"
+        if "--incite-proposal-md" not in _argv and prop.is_file():
+            _argv.extend(["--incite-proposal-md", str(prop)])
+        sys.argv = _argv
+        from research_lab.workflow import main as run_research_lab_main
+        sys.exit(run_research_lab_main())
 
     check_env()
     if args.resume:

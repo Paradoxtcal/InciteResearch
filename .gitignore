@@ -1,1 +1,45 @@
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Secrets / local env
+.env
+.env.local
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project caches & outputs (regenerate locally)
+.research_agent_cache/
+*.pkl
+state_saves/
+
+# LaTeX / lab build noise
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz

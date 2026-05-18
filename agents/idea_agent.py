@@ -374,17 +374,37 @@ def paper_search_node(state: ResearchState) -> ResearchState:
         max_n=12,
     )
 
+    try:
+        from tqdm import tqdm as _tqdm
+    except Exception:
+        _tqdm = None
+
     papers = []
     if terms:
         use_n = min(6, len(terms))
         per_kw = max(6, total_target // max(1, use_n))
         q = " ".join(terms[: min(3, use_n)]).strip()
+        kw_slice4 = terms[: min(4, use_n)]
+        kw_slice_use = terms[:use_n]
+        n0 = 1 if q else 0
+        if _tqdm:
+            _pbar = _tqdm(total=n0 + len(kw_slice4) + len(kw_slice_use), desc="Literature search", leave=False, unit="query")
+        else:
+            _pbar = None
         if q:
             papers += search_semantic_scholar(q, limit=min(80, max(per_kw, 12)))
-        for kw in terms[: min(4, use_n)]:
+            if _pbar:
+                _pbar.update(1)
+        for kw in kw_slice4:
             papers += search_semantic_scholar(kw, limit=min(60, max(per_kw, 10)))
-        for kw in terms[:use_n]:
+            if _pbar:
+                _pbar.update(1)
+        for kw in kw_slice_use:
             papers += search_arxiv_recent(kw, limit=min(80, max(per_kw, 12)))
+            if _pbar:
+                _pbar.update(1)
+        if _pbar is not None:
+            _pbar.close()
 
     if not papers and translated_queries:
         for q in translated_queries[:2]:

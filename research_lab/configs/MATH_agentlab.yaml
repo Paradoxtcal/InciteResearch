@@ -1,0 +1,23 @@
+# Human-in-the-loop (CLI prompts between phases)
+copilot-mode: False
+
+language: "English"
+
+num-papers-lit-review: 10
+num-papers-to-write: 1
+parallel-labs: False
+
+mlesolver-max-steps: 1
+papersolver-max-steps: 1
+lab-index: 1
+load-existing: False
+except-if-fail: False
+
+# Unicode character count of the ```PLAN fenced body (see builtin_defaults.yaml merge)
+min-plan-chars: 50000
+
+compile-latex: False
+
+task-notes:
+  plan-formulation:
+  - "Refine the research topic into an executable method plan. When using InciteResearch --refine-method, the full proposal is injected automatically from research_proposal.md."

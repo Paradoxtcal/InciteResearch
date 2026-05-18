@@ -35,6 +35,35 @@ def _normalize_gemini_model(model: str | None) -> str | None:
     return s
 
 
+def _deepseek_openai_model_id(model: str | None, base_url: str) -> str:
+    """
+    OpenAI-compatible gateways (e.g. ofox) often expect vendor-prefixed ids, matching research_lab inference.
+    Official api.deepseek.com typically accepts ids without the deepseek/ prefix.
+    """
+    m = (model or "").strip() or "deepseek-chat"
+    b = (base_url or "").lower()
+    if "ofox.ai" in b:
+        if m == "deepseek-v3.2":
+            return "deepseek/deepseek-v3.2"
+        if m == "deepseek-chat":
+            return "deepseek-chat"
+        if m.startswith("deepseek-"):
+            return f"deepseek/{m}"
+    return m
+
+
+def _normalize_deepseek_openai_base_url(url: str | None) -> str:
+    """
+    DeepSeek documents the host as https://api.deepseek.com; the OpenAI-compatible API lives under /v1.
+    """
+    raw = (url or "").strip().rstrip("/")
+    if not raw:
+        return "https://api.deepseek.com/v1"
+    if raw in ("https://api.deepseek.com", "http://api.deepseek.com"):
+        return "https://api.deepseek.com/v1"
+    return raw
+
+
 class _RetryingLLM:
     def __init__(self, inner, provider: str, temperature: float, model: str | None):
         self._inner = inner
@@ -76,7 +105,13 @@ class _RetryingLLM:
 
     def _is_invalid_api_key(self, msg: str) -> bool:
         m = msg.lower()
-        return ("api key not valid" in m) or ("api_key_invalid" in m) or ("invalid api key" in m)
+        if ("api key not valid" in m) or ("api_key_invalid" in m) or ("invalid api key" in m):
+            return True
+        if "invalid or expired api key" in m:
+            return True
+        if ("authenticationerror" in m or "401" in m) and ("invalid" in m or "unauthorized" in m):
+            return True
+        return False
 
     def _is_transient_network_error(self, err: Exception, msg: str) -> bool:
         m = (msg or "").lower()
@@ -173,6 +208,15 @@ class _RetryingLLM:
                         "(RESEARCH_AGENT_LLM_PROVIDER=openai/anthropic) and configure the corresponding API key."
                     ) from e
                 if self._provider == "openai" and self._is_invalid_api_key(msg):
+                    prov = (os.environ.get("RESEARCH_AGENT_LLM_PROVIDER") or "").strip().lower()
+                    if prov in ("deepseek", "deep-seek"):
+                        raise RuntimeError(
+                            "Invalid DEEPSEEK_API_KEY or OPENAI_API_KEY for the configured base URL (401). "
+                            "Default host is https://api.deepseek.com/v1 (set DEEPSEEK_BASE_URL=https://api.deepseek.com if you prefer; it is normalized to …/v1). "
+                            "Third-party gateways (e.g. ofox) require DEEPSEEK_BASE_URL=https://api.ofox.ai/v1 with a key from that host. "
+                            "If both DEEPSEEK_API_KEY and OPENAI_API_KEY are set, DEEPSEEK_API_KEY is used first—remove a stale value. "
+                            "On ofox, OPENAI_MODEL is rewritten to deepseek/… when the base URL is ofox."
+                        ) from e
                     raise RuntimeError("Invalid OPENAI_API_KEY. Update your OpenAI key and retry.") from e
                 if self._provider in ("anthropic", "claude") and self._is_invalid_api_key(msg):
                     raise RuntimeError("Invalid ANTHROPIC_API_KEY. Update your Anthropic key and retry.") from e
@@ -348,6 +392,25 @@ def get_llm(
         )
         return _RetryingLLM(inner, provider="anthropic", temperature=temperature, model=model)
 
+    if provider in ("deepseek", "deep-seek"):
+        dsk = _clean_key(os.environ.get("DEEPSEEK_API_KEY"))
+        oai = _clean_key(os.environ.get("OPENAI_API_KEY"))
+        api_key = dsk or oai
+        if not api_key:
+            raise RuntimeError("DEEPSEEK_API_KEY (or OPENAI_API_KEY) is required when provider=deepseek")
+        base_url = _normalize_deepseek_openai_base_url(
+            os.environ.get("DEEPSEEK_BASE_URL") or os.environ.get("OPENAI_BASE_URL")
+        )
+        raw_m = model or os.environ.get("OPENAI_MODEL") or os.environ.get("DEEPSEEK_MODEL") or "deepseek-chat"
+        m = _deepseek_openai_model_id(raw_m, base_url)
+        inner = ChatOpenAI(
+            model=m,
+            temperature=temperature,
+            api_key=api_key,
+            base_url=base_url,
+        )
+        return _RetryingLLM(inner, provider="openai", temperature=temperature, model=m)
+
     if gemini_key:
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI
@@ -382,10 +445,25 @@ def get_llm(
     except ImportError:
         pass
 
+    dsk = _clean_key(os.environ.get("DEEPSEEK_API_KEY"))
+    if dsk:
+        base_url = _normalize_deepseek_openai_base_url(
+            os.environ.get("DEEPSEEK_BASE_URL") or os.environ.get("OPENAI_BASE_URL")
+        )
+        raw_m = model or os.environ.get("OPENAI_MODEL") or os.environ.get("DEEPSEEK_MODEL") or "deepseek-chat"
+        m = _deepseek_openai_model_id(raw_m, base_url)
+        inner = ChatOpenAI(
+            model=m,
+            temperature=temperature,
+            api_key=dsk,
+            base_url=base_url,
+        )
+        return _RetryingLLM(inner, provider="openai", temperature=temperature, model=m)
+
     try:
         from langchain_community.chat_models import ChatOllama
     except ImportError as e:
-        raise RuntimeError("No LLM provider available. Set GEMINI_API_KEY/OPENAI_API_KEY/ANTHROPIC_API_KEY or install Ollama chat support.") from e
+        raise RuntimeError("No LLM provider available. Set GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY / DEEPSEEK_API_KEY, or install Ollama chat support.") from e
 
     inner = ChatOllama(
         model=model or os.environ.get("OLLAMA_MODEL", "llama3"),

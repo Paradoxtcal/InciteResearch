@@ -1,0 +1,18 @@
+# Built-in defaults merged under user experiment YAML (user keys override these).
+research-output-subdir: MATH_research_dir
+min-plan-chars: 50000
+arxiv:
+  summary-count-per-query: 5
+  paper-expiration-time-steps: 3
+# When pre-filling from research_state.json: reuse main.py PDF pipeline (partial read, capped).
+literature-prefill:
+  pdf-excerpt: true
+  pdf-max-pages: 8
+  pdf-max-chars: 20000
+plan-formulation:
+  convergence-min-chars: 15000
+  convergence-span-tolerance-floor: 500
+  convergence-span-tolerance-frac: 0.02
+  accept-as-converged-fraction-of-min-plan: 0.125
+  # Plateau early-stop uses only the length sequence (median prior step + peak); no extra YAML thresholds.
+  saturation-enable: true

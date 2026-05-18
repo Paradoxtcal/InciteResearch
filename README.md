@@ -4,7 +4,7 @@
 
 **The missing first step in AI-assisted research**
 
-Turn a researcher's vague frustration into a breakable assumption, a falsifiable story, and annotated core-algorithm code ready to hand off to Cursor or Claude Code.
+Turn a vague frustration into a breakable assumption, a falsifiable story arc, and a **concrete, method-level proposal**.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/) [![arXiv](https://img.shields.io/badge/arXiv-2605.06345-b31b1b.svg)](https://arxiv.org/abs/2605.06345) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -16,9 +16,13 @@ English | [简体中文](README_zh.md)
 
 ---
 
-Every existing AI research tool starts from a clear topic. [AutoResearchClaw](https://github.com/aiming-lab/AutoResearchClaw) turns a direction into a full paper pipeline. [karpathy/autoresearch](https://github.com/karpathy/autoresearch) runs overnight experiment loops given a training script. [DeepInnovator](https://github.com/HKUDS/DeepInnovator) generates hypotheses from literature distributions. They all assume you already know what you want to work on.
+<div align="center">
+  <div style="position:relative;display:inline-block;width:min(820px,100%);margin:auto;">
+    <img src="assets/1.png" alt="" style="display:block;width:100%;height:auto;"/>
+  </div>
+</div>
 
-Most real research starts somewhere messier: a method that feels wrong, a paper whose assumption seems shaky, an evaluation metric you've never trusted. InciteResearch works at that moment — before the topic is clear — and produces something concrete enough for the downstream tools to take over.
+Every existing AI research tool starts from an already crisp **task**: a title, a benchmark, or a training recipe. Most real research starts earlier: a method that feels wrong, a shaky assumption in a paper, a metric you distrust. InciteResearch works **before** you have that crisp task. It compresses a fuzzy itch into an **executable method narrative** (what to build, what to compare, what would falsify the idea) — specific enough for the tools above to take over.
 
 > 📄 **Paper:** [More Than Can Be Said: A Benchmark and Framework for Pre-Question Scientific Ideation](https://arxiv.org/abs/2605.06345) — Jie Yu, Song Qiu (arXiv:2605.06345 [cs.AI])
 
@@ -26,11 +30,10 @@ Most real research starts somewhere messier: a method that feels wrong, a paper 
 
 ---
 
-- Friction-first elicitation — starts from what bothers you, not what you've already decided
-- Assumption Breaking over Gap Analysis — produces directions that challenge a field's premises rather than adding a module to an existing method
-- Story arc validation — the method must be the logically necessary consequence of the insight, not merely a reasonable option
-- AI-assistant-ready code output — `core_algorithm.py` is written for another AI to read, with `# WHY` and `# DIFF`annotations on every non-trivial line
-- Direct IDE integration — `cursor_prompt.txt` is a ready-to-paste instruction for integrating the core code into a chosen baseline
+- Friction-first elicitation — starts from what bothers you, not from a finished research question
+- Assumption Breaking over Gap Analysis — yields directions that attack a field's hidden premises instead of bolting a module onto a baseline
+- Story arc validation — the **method** must be the logically necessary consequence of the insight, not one of many plausible add-ons
+- **Structured artifacts** — chiefly `research_proposal.md` and related session state; **`--refine-method`** extends the same thread into a long, checkable **PLAN** grounded in literature
 
 ## A New Paradigm
 
@@ -44,17 +47,17 @@ This is not a pipeline with a human in the loop. It is a cognitive collaboration
 
 Three operators make this concrete:
 
-- **E (Elicitation)** — surfaces the researcher's implicit friction into a five-dimensional structured profile: friction points, motivation, constraints, taste, and refined topic. The friction point is the gravitational center; everything else orbits it.
+- **E (Elicitation)** — surfaces implicit friction into a structured profile (friction point, motivation, constraints, taste, and a **working method angle**). The friction anchors everything else.
 - **V (Validity & Reframing)** — instead of finding gaps in the literature, identifies the hidden assumption that, if broken, maximizes the product of feasibility and novelty. The output is not an incremental rewrite of the original direction but a re-anchoring under a new conceptual coordinate system.
 - **N (Necessity Checking)** — acts as a strict reviewer. The proposed method must be the logically necessary consequence of the insight, not merely one of several plausible options. Any component that cannot be derived from the causal chain is rejected.
 
 This paradigm — **Elicit → Violate → Necessitate** — is not an arbitrary modularization of Socratic questioning. Ablation results show that removing V causes the sharpest drop across all metrics (novelty 4.250 → 3.500, impact 4.397 → 3.720), confirming that assumption violation carries structural weight, not merely stylistic variety. Removing E causes the second-largest drop in novelty and is the only ablation where feasibility _increases_, revealing that the E stage is responsible for anchoring generation on real friction rather than surface-level reformulation.
 
-The output of InciteResearch — a structured proposal with an annotated `core_algorithm.py` and a `cursor_prompt.txt` — is designed specifically to serve as the input to downstream execution tools. InciteResearch covers Phase 0–2. It does not reimplement what other tools already do well.
-
 ## Quick Start
 
 ---
+
+### Install
 
 ```bash
 git clone https://github.com/Paradoxtcal/InciteResearch
@@ -62,12 +65,33 @@ cd InciteResearch
 pip install -r requirements.txt
 
 cp .env.example .env
-# add your API_KEY to .env
+```
 
+Edit `.env` with at least one provider and matching `*_MODEL` where needed (see `.env.example`).
+
+### Main CLI (vague idea → structured proposal)
+
+```bash
 python main.py
 ```
 
-The session opens with a single question. Answer naturally — there is no form to fill in. Any language works.
+> **Tip — already have a direction?** At the first *research direction* prompt, enter your confusion in full (paragraphs are fine). For later numbered multiple-choice prompts, type **`1`** and press Enter each time to take the first option and move on quickly.
+
+The session opens with a single prompt. Answer in plain language — there is no form, and any language is fine.
+
+Resume a saved session:
+
+```bash
+python main.py --resume <session_id_from_research_state>
+```
+
+### Method refinement lab (`--refine-method`)
+
+**Typical path:** run `python main.py` first when you want `research_proposal.md` in the repo root, then:
+
+```bash
+python main.py --refine-method
+```
 
 ## Scope of Application
 
